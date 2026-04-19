@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniTrips — University Trip Management Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg2: #111827;
+  --bg3: #1a2235;
+  --bg4: #212d42;
+  --accent: #3b82f6;
+  --accent2: #60a5fa;
+  --accent-glow: rgba(59,130,246,0.15);
+  --gold: #f59e0b;
+  --gold2: #fcd34d;
+  --green: #10b981;
+  --green2: #34d399;
+  --red: #ef4444;
+  --red2: #f87171;
+  --purple: #8b5cf6;
+  --purple2: #a78bfa;
+  --orange: #f97316;
+  --teal: #14b8a6;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #475569;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --radius: 12px;
+  --radius2: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+h1,h2,h3{font-family:'DM Serif Display',serif;font-weight:400}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1rem}
+.login-wrap{width:100%;max-width:440px}
+.login-logo{text-align:center;margin-bottom:2rem}
+.login-logo h1{font-size:2.2rem;color:var(--text);letter-spacing:-0.5px}
+.login-logo p{color:var(--text2);font-size:13px;margin-top:4px}
+.login-logo .logo-mark{width:56px;height:56px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+.role-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.role-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;cursor:pointer;transition:all .2s;text-align:center}
+.role-card:hover{border-color:var(--border2);background:var(--bg4)}
+.role-card.selected{border-color:var(--accent);background:var(--accent-glow)}
+.role-card svg{display:block;margin:0 auto .5rem}
+.role-card .role-name{font-weight:500;font-size:14px}
+.role-card .role-desc{font-size:11px;color:var(--text2);margin-top:2px}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:12px;color:var(--text2);margin-bottom:5px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.form-group input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s}
+.form-group input:focus{outline:none;border-color:var(--accent)}
+.form-group input::placeholder{color:var(--text3)}
+.btn-login{width:100%;padding:12px;background:var(--accent);border:none;border-radius:var(--radius2);color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-login:hover{background:#2563eb;transform:translateY(-1px)}
+.demo-hint{text-align:center;margin-top:1rem;font-size:12px;color:var(--text3)}
+.demo-hint span{color:var(--accent2);cursor:pointer}
+.demo-hint span:hover{text-decoration:underline}
+
+/* ── APP SHELL ── */
+#app-shell{display:none;height:100vh;flex-direction:column}
+#app-shell.visible{display:flex}
+
+/* ── SIDEBAR ── */
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:230px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar-header{padding:1.25rem 1rem 1rem;border-bottom:1px solid var(--border)}
+.sidebar-logo{display:flex;align-items:center;gap:10px}
+.sidebar-logo .mark{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-logo .brand{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text)}
+.sidebar-logo .ver{font-size:10px;color:var(--text3);margin-top:-2px}
+.sidebar-user{padding:.85rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0}
+.avatar.admin{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff}
+.avatar.student{background:linear-gradient(135deg,#059669,#0284c7);color:#fff}
+.user-name{font-size:13px;font-weight:500}
+.user-role{font-size:11px;color:var(--text2)}
+.nav-section{padding:.75rem 0}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:0 1rem .4rem;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.55rem 1rem;cursor:pointer;transition:all .15s;border-left:2px solid transparent;color:var(--text2);font-size:13px;font-weight:400}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-glow);border-left-color:var(--accent);color:var(--accent2);font-weight:500}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;min-width:16px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:1rem;border-top:1px solid var(--border)}
+.logout-btn{display:flex;align-items:center;gap:8px;color:var(--text2);cursor:pointer;font-size:13px;padding:.4rem 0;transition:color .15s}
+.logout-btn:hover{color:var(--red2)}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.page-header{padding:1.5rem 1.75rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:var(--bg2)}
+.page-title{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--text)}
+.page-sub{font-size:12px;color:var(--text2);margin-top:1px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.content-area{padding:1.5rem 1.75rem}
+
+/* ── PANELS ── */
+.panel{display:none}.panel.active{display:block}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.25rem;transition:border-color .2s;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.blue::before{background:var(--accent)}
+.stat-card.gold::before{background:var(--gold)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.purple::before{background:var(--purple)}
+.stat-card.red::before{background:var(--red)}
+.stat-card.teal::before{background:var(--teal)}
+.stat-card:hover{border-color:var(--border2)}
+.stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:.65rem}
+.stat-icon.blue{background:rgba(59,130,246,.15)}
+.stat-icon.gold{background:rgba(245,158,11,.15)}
+.stat-icon.green{background:rgba(16,185,129,.15)}
+.stat-icon.purple{background:rgba(139,92,246,.15)}
+.stat-icon.red{background:rgba(239,68,68,.15)}
+.stat-icon.teal{background:rgba(20,184,166,.15)}
+.stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+.stat-value{font-size:24px;font-weight:600;margin:.2rem 0 .1rem;font-family:'DM Serif Display',serif}
+.stat-change{font-size:11px;color:var(--text3)}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.card-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap}
+.card-title{font-size:14px;font-weight:500;color:var(--text)}
+.card-body{padding:1.25rem}
+
+/* ── TRIPS TABLE / CARDS ── */
+.trip-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:.65rem;display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap;transition:all .2s;cursor:pointer}
+.trip-item:hover{border-color:var(--border2);background:var(--bg4)}
+.trip-item-left{flex:1;min-width:180px}
+.trip-dest-line{font-weight:500;font-size:15px;color:var(--text);margin-bottom:4px;font-family:'DM Serif Display',serif}
+.trip-meta-row{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--text2);margin-bottom:6px}
+.trip-meta-row span{display:flex;align-items:center;gap:4px}
+.trip-tags{display:flex;gap:5px;flex-wrap:wrap}
+.trip-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+.trip-budget{font-size:16px;font-weight:600;color:var(--accent2)}
+.trip-actions-row{display:flex;gap:5px}
+
+/* ── BADGES ── */
+.badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:3px;letter-spacing:.3px}
+.badge-academic{background:rgba(59,130,246,.2);color:#93c5fd}
+.badge-cultural{background:rgba(16,185,129,.2);color:#6ee7b7}
+.badge-research{background:rgba(245,158,11,.2);color:#fcd34d}
+.badge-conference{background:rgba(139,92,246,.2);color:#c4b5fd}
+.badge-sports{background:rgba(249,115,22,.2);color:#fdba74}
+.badge-hackathon{background:rgba(236,72,153,.2);color:#f9a8d4}
+.badge-pending{background:rgba(245,158,11,.2);color:#fcd34d}
+.badge-approved{background:rgba(16,185,129,.2);color:#6ee7b7}
+.badge-completed{background:rgba(59,130,246,.2);color:#93c5fd}
+.badge-rejected{background:rgba(239,68,68,.2);color:#fca5a5}
+.badge-dept{background:rgba(20,184,166,.2);color:#5eead4}
+
+/* ── BUTTONS ── */
+.btn{padding:7px 14px;border-radius:var(--radius2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .18s;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:#2563eb}
+.btn-ghost{background:transparent;color:var(--text2);border-color:var(--border2)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-success{background:rgba(16,185,129,.2);color:var(--green2);border-color:rgba(16,185,129,.3)}
+.btn-success:hover{background:rgba(16,185,129,.3)}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red2);border-color:rgba(239,68,68,.3)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-warn{background:rgba(245,158,11,.15);color:var(--gold2);border-color:rgba(245,158,11,.3)}
+.btn-warn:hover{background:rgba(245,158,11,.25)}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-xs{padding:3px 8px;font-size:11px}
+.btn:active{transform:scale(.97)}
+
+/* ── FORMS ── */
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:.85rem}
+.fg label{font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.fg input,.fg select,.fg textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color .2s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--accent)}
+.fg select option{background:var(--bg3)}
+.fg textarea{resize:vertical;min-height:80px}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--text3)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem}
+.full{grid-column:1/-1}
+
+/* ── NOTIFICATIONS ── */
+.notif-item{display:flex;gap:12px;padding:.9rem 1rem;border-bottom:1px solid var(--border);transition:background .15s}
+.notif-item:last-child{border-bottom:none}
+.notif-item:hover{background:var(--bg3)}
+.notif-item.unread{background:rgba(59,130,246,.05)}
+.notif-dot-wrap{flex-shrink:0;padding-top:4px}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.notif-dot.unread{background:var(--accent)}
+.notif-dot.read{background:var(--text3)}
+.notif-body{flex:1}
+.notif-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.notif-msg{font-size:12px;color:var(--text2);margin-bottom:4px}
+.notif-foot{display:flex;gap:10px;font-size:11px;color:var(--text3)}
+
+/* ── CALENDAR ── */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.cal-month{font-family:'DM Serif Display',serif;font-size:1.2rem}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-head{text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:6px 0}
+.cal-cell{min-height:64px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px;transition:border-color .15s}
+.cal-cell:hover{border-color:var(--border2)}
+.cal-cell.other{background:var(--bg);opacity:.5}
+.cal-cell.today{border-color:var(--accent)}
+.cal-num{font-size:11px;font-weight:500;margin-bottom:2px;color:var(--text2)}
+.cal-cell.today .cal-num{color:var(--accent2);font-weight:600}
+.cal-ev{font-size:9px;padding:1px 5px;border-radius:3px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.ev-a{background:rgba(59,130,246,.3);color:#93c5fd}
+.ev-c{background:rgba(16,185,129,.3);color:#6ee7b7}
+.ev-r{background:rgba(245,158,11,.3);color:#fcd34d}
+.ev-co{background:rgba(139,92,246,.3);color:#c4b5fd}
+.ev-s{background:rgba(249,115,22,.3);color:#fdba74}
+.ev-h{background:rgba(236,72,153,.3);color:#f9a8d4}
+
+/* ── ROSTER TABLE ── */
+.tbl-wrap{overflow-x:auto}
+.data-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.data-tbl th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.data-tbl td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text2)}
+.data-tbl tr:last-child td{border-bottom:none}
+.data-tbl tr:hover td{background:var(--bg3);color:var(--text)}
+
+/* ── BUDGET BAR ── */
+.bbar-row{margin-bottom:.6rem}
+.bbar-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.bbar-label{color:var(--text2)}
+.bbar-val{color:var(--text);font-weight:500}
+.bbar-track{height:6px;background:var(--bg4);border-radius:99px;overflow:hidden}
+.bbar-fill{height:100%;border-radius:99px;transition:width .4s}
+
+/* ── MODAL ── */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:1rem}
+.modal-backdrop.open{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'DM Serif Display',serif;font-size:1.2rem}
+.modal-close{width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .15s}
+.modal-close:hover{background:var(--bg4);color:var(--text)}
+.modal-body{padding:1.5rem}
+.modal-foot{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.detail-row:last-child{border-bottom:none}
+.detail-key{color:var(--text2)}
+.detail-val{color:var(--text);font-weight:500}
+
+/* ── TOAST ── */
+.toast-stack{position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:6px;z-index:999}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius2);padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);transition:all .25s;min-width:200px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{border-color:rgba(16,185,129,.4)}
+.toast.error{border-color:rgba(239,68,68,.4)}
+.toast .t-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.toast.success .t-dot{background:var(--green)}
+.toast.error .t-dot{background:var(--red)}
+.toast.info .t-dot{background:var(--accent)}
+
+/* ── APPROVAL STEPS ── */
+.workflow-steps{display:flex;align-items:center;gap:0;margin-bottom:1.5rem}
+.wstep{flex:1;text-align:center;position:relative}
+.wstep:not(:last-child)::after{content:'';position:absolute;top:14px;left:calc(50% + 16px);right:calc(-50% + 16px);height:1px;background:var(--border2)}
+.wstep-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;margin:0 auto .4rem;font-size:11px;font-weight:600;background:var(--bg3);color:var(--text3);position:relative;z-index:1}
+.wstep.done .wstep-dot{background:var(--green);border-color:var(--green);color:#fff}
+.wstep.active .wstep-dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.wstep-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+.wstep.done .wstep-label{color:var(--green2)}
+.wstep.active .wstep-label{color:var(--accent2)}
+
+/* ── STUDENT BANNER ── */
+.welcome-banner{background:linear-gradient(135deg,rgba(59,130,246,.15),rgba(139,92,246,.15));border:1px solid rgba(59,130,246,.2);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.wb-icon{width:48px;height:48px;border-radius:12px;background:rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wb-text .wb-title{font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--text)}
+.wb-text .wb-sub{font-size:12px;color:var(--text2);margin-top:2px}
+
+/* ── APPLY CARD ── */
+.apply-card{background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(20,184,166,.08));border:1px solid rgba(16,185,129,.2);border-radius:var(--radius);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.65rem;cursor:pointer;transition:all .2s}
+.apply-card:hover{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.12)}
+
+/* ── SEARCH BAR ── */
+.search-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.search-input-wrap{position:relative;flex:1;min-width:160px}
+.search-input-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none}
+.search-input-wrap input{padding-left:34px}
+.search-input-wrap input{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);padding:8px 12px 8px 34px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;width:100%;transition:border-color .2s}
+.search-input-wrap input:focus{outline:none;border-color:var(--accent)}
+.filter-select{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);padding:8px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer}
+.filter-select option{background:var(--bg3)}
+
+/* ── PROGRESS ── */
+.progress-wrap{background:var(--bg4);border-radius:99px;height:6px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:99px;background:var(--accent)}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text2)}
+.empty-state svg{opacity:.3;margin:0 auto .75rem;display:block}
+.empty-state p{font-size:14px}
+
+/* ── GRID HELPERS ── */
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-bottom:1rem}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ LOGIN ════════════════ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div class="logo-mark">
+        <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M12 3L2 8l10 5 10-5-10-5z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M2 12l10 5 10-5" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M2 17l10 5 10-5" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </div>
+      <h1>UniTrips</h1>
+      <p>University Trip &amp; Events Management Portal</p>
+    </div>
+    <div class="role-cards">
+      <div class="role-card selected" onclick="selectRole('admin')" id="role-admin">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M12 1l3 6.5L22 8.5l-5 4.8 1.2 6.7L12 17l-6.2 3 1.2-6.7L2 8.5l7-.999L12 1z" stroke="#8b5cf6" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <div class="role-name">Admin</div>
+        <div class="role-desc">Manage trips &amp; approvals</div>
+      </div>
+      <div class="role-card" onclick="selectRole('student')" id="role-student">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z" stroke="#10b981" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 12v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5" stroke="#10b981" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <div class="role-name">Student</div>
+        <div class="role-desc">Browse &amp; apply for trips</div>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Username / Student ID</label>
+      <input type="text" id="login-user" placeholder="e.g. admin or ENG001" value="admin">
+    </div>
+    <div class="fg">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••" value="admin123">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Sign In to Portal</button>
+    <div class="demo-hint">
+      Admin: admin / admin123 &nbsp;|&nbsp; Student: <span onclick="fillStudent()">ENG001 / student123</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ APP SHELL ════════════════ -->
+<div id="app-shell">
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="mark">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 3L2 8l10 5 10-5-10-5z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+          </div>
+          <div><div class="brand">UniTrips</div><div class="ver">Portal v2.0</div></div>
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="avatar" id="sb-avatar"></div>
+        <div><div class="user-name" id="sb-name"></div><div class="user-role" id="sb-role"></div></div>
+      </div>
+      <div id="sidebar-nav"></div>
+      <div class="sidebar-footer">
+        <div class="logout-btn" onclick="doLogout()">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sign Out
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main" id="main-content">
+      <!-- panels injected here -->
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal" onclick="maybeClose(event)">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-stack" id="toasts"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   BACKEND — Java-style architecture in JavaScript
+   Mirrors Spring Boot: Service → Repository → Model
+═══════════════════════════════════════════════════ */
+
+// ── MODELS ──
+class TripModel {
+  constructor(d) {
+    this.id = d.id;
+    this.destination = d.destination;
+    this.country = d.country || 'Kenya';
+    this.type = d.type;
+    this.department = d.department;
+    this.startDate = d.startDate;
+    this.endDate = d.endDate;
+    this.students = d.students || 0;
+    this.staff = d.staff || 0;
+    this.budgetTransport = d.budgetTransport || 0;
+    this.budgetAccommodation = d.budgetAccommodation || 0;
+    this.budgetMeals = d.budgetMeals || 0;
+    this.budgetOther = d.budgetOther || 0;
+    this.coordinator = d.coordinator || '';
+    this.email = d.email || '';
+    this.description = d.description || '';
+    this.status = d.status || 'pending';
+    this.roster = d.roster || [];
+    this.createdAt = d.createdAt || new Date().toISOString();
+  }
+  get totalBudget() { return this.budgetTransport + this.budgetAccommodation + this.budgetMeals + this.budgetOther; }
+  get totalParticipants() { return this.students + this.staff; }
+}
+
+class UserModel {
+  constructor(d) {
+    this.id = d.id;
+    this.name = d.name;
+    this.username = d.username;
+    this.password = d.password;
+    this.role = d.role; // 'admin' | 'student'
+    this.department = d.department || '';
+    this.email = d.email || '';
+    this.appliedTrips = d.appliedTrips || [];
+  }
+}
+
+class NotificationModel {
+  constructor(d) {
+    this.id = d.id;
+    this.department = d.department;
+    this.type = d.type;
+    this.title = d.title;
+    this.message = d.message;
+    this.createdAt = d.createdAt || new Date().toISOString();
+    this.read = d.read || false;
+    this.color = d.color || 'info';
+    this.targetRole = d.targetRole || 'all'; // 'all'|'admin'|'student'
+  }
+}
+
+// ── REPOSITORIES (in-memory data store) ──
+class TripRepository {
+  constructor() { this._store = []; this._seq = 1; }
+  save(trip) {
+    if (!trip.id) { trip.id = this._seq++; this._store.push(trip); }
+    else { const i = this._store.findIndex(t => t.id === trip.id); if (i >= 0) this._store[i] = trip; }
+    return trip;
+  }
+  findAll() { return [...this._store]; }
+  findById(id) { return this._store.find(t => t.id === id) || null; }
+  findByDepartment(dept) { return this._store.filter(t => t.department === dept); }
+  findByStatus(status) { return this._store.filter(t => t.status === status); }
+  deleteById(id) { this._store = this._store.filter(t => t.id !== id); }
+}
+
+class UserRepository {
+  constructor() { this._store = []; }
+  save(user) { this._store.push(user); return user; }
+  findByUsername(u) { return this._store.find(x => x.username === u) || null; }
+  findByRole(role) { return this._store.filter(x => x.role === role); }
+  findById(id) { return this._store.find(x => x.id === id) || null; }
+}
+
+class NotificationRepository {
+  constructor() { this._store = []; this._seq = 1; }
+  save(n) { if (!n.id) { n.id = this._seq++; } this._store.push(n); return n; }
+  findAll() { return [...this._store]; }
+  findByDepartment(dept) { return this._store.filter(n => !dept || n.department === dept || n.department === 'All'); }
+  findUnreadCount() { return this._store.filter(n => !n.read).length; }
+  markRead(id) { const n = this._store.find(x => x.id === id); if (n) n.read = true; }
+  markAllRead() { this._store.forEach(n => n.read = true); }
+}
+
+// ── SERVICES (business logic) ──
+class TripService {
+  constructor(repo) { this.repo = repo; }
+  createTrip(data) {
+    const trip = new TripModel({ ...data, status: 'pending', createdAt: new Date().toISOString() });
+    return this.repo.save(trip);
+  }
+  getAllTrips(filters = {}) {
+    let trips = this.repo.findAll();
+    if (filters.search) { const q = filters.search.toLowerCase(); trips = trips.filter(t => t.destination.toLowerCase().includes(q) || t.department.toLowerCase().includes(q) || t.coordinator.toLowerCase().includes(q)); }
+    if (filters.type) trips = trips.filter(t => t.type === filters.type);
+    if (filters.department) trips = trips.filter(t => t.department === filters.department);
+    if (filters.status) trips = trips.filter(t => t.status === filters.status);
+    return trips;
+  }
+  getTripById(id) { return this.repo.findById(id); }
+  updateStatus(id, status) {
+    const trip = this.repo.findById(id);
+    if (!trip) throw new Error('Trip not found');
+    trip.status = status;
+    return this.repo.save(trip);
+  }
+  addToRoster(tripId, student) {
+    const trip = this.repo.findById(tripId);
+    if (!trip) throw new Error('Trip not found');
+    if (trip.roster.find(s => s.id === student.id)) throw new Error('Student already on roster');
+    trip.roster.push(student);
+    return this.repo.save(trip);
+  }
+  removeFromRoster(tripId, studentId) {
+    const trip = this.repo.findById(tripId);
+    if (!trip) throw new Error('Trip not found');
+    trip.roster = trip.roster.filter(s => s.id !== studentId);
+    return this.repo.save(trip);
+  }
+  deleteTrip(id) { this.repo.deleteById(id); }
+  getDashboardStats() {
+    const all = this.repo.findAll();
+    return {
+      total: all.length,
+      pending: all.filter(t => t.status === 'pending').length,
+      approved: all.filter(t => t.status === 'approved').length,
+      completed: all.filter(t => t.status === 'completed').length,
+      rejected: all.filter(t => t.status === 'rejected').length,
+      totalParticipants: all.reduce((s, t) => s + t.totalParticipants, 0),
+      totalBudget: all.reduce((s, t) => s + t.totalBudget, 0),
+    };
+  }
+}
+
+class AuthService {
+  constructor(userRepo) { this.repo = userRepo; this.currentUser = null; }
+  login(username, password) {
+    const user = this.repo.findByUsername(username);
+    if (!user || user.password !== password) throw new Error('Invalid credentials');
+    this.currentUser = user;
+    return user;
+  }
+  logout() { this.currentUser = null; }
+  getUser() { return this.currentUser; }
+}
+
+class NotificationService {
+  constructor(repo) { this.repo = repo; }
+  send(dept, type, title, message, color = 'info', targetRole = 'all') {
+    return this.repo.save(new NotificationModel({ department: dept, type, title, message, color, targetRole }));
+  }
+  getForUser(user) {
+    return this.repo.findAll().filter(n =>
+      (n.targetRole === 'all' || n.targetRole === user.role) &&
+      (!n.department || n.department === 'All' || n.department === user.department)
+    ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+  getAll() { return this.repo.findAll().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); }
+  getUnreadCount(user) { return this.getForUser(user).filter(n => !n.read).length; }
+  markRead(id) { this.repo.markRead(id); }
+  markAllRead() { this.repo.markAllRead(); }
+}
+
+// ── DEPENDENCY INJECTION / BOOTSTRAP ──
+const tripRepo = new TripRepository();
+const userRepo = new UserRepository();
+const notifRepo = new NotificationRepository();
+const tripService = new TripService(tripRepo);
+const authService = new AuthService(userRepo);
+const notifService = new NotificationService(notifRepo);
+
+// ── SEED DATA ──
+function seedData() {
+  // Users
+  [
+    { id: 'ADM001', name: 'Dr. James Kariuki', username: 'admin', password: 'admin123', role: 'admin', department: 'Administration', email: 'j.kariuki@uni.ac.ke' },
+    { id: 'ENG001', name: 'Kevin Odhiambo', username: 'ENG001', password: 'student123', role: 'student', department: 'Engineering', email: 'k.odhiambo@student.uni.ac.ke' },
+    { id: 'BUS002', name: 'Faith Njeri', username: 'BUS002', password: 'student123', role: 'student', department: 'Business', email: 'f.njeri@student.uni.ac.ke' },
+    { id: 'SCI001', name: 'Grace Achieng', username: 'SCI001', password: 'student123', role: 'student', department: 'Science', email: 'g.achieng@student.uni.ac.ke' },
+  ].forEach(u => userRepo.save(new UserModel(u)));
+
+  // Trips
+  [
+    { destination: 'Mombasa', country: 'Kenya', type: 'Cultural', department: 'Humanities', startDate: '2026-05-10', endDate: '2026-05-14', students: 45, staff: 4, budgetTransport: 120000, budgetAccommodation: 150000, budgetMeals: 40000, budgetOther: 10000, coordinator: 'Dr. Wambua Njoroge', email: 'w.njoroge@uni.ac.ke', description: 'Swahili Coast heritage tour — Fort Jesus, Gede Ruins, and Old Town.', status: 'approved', roster: [{ id: 'HUM001', name: 'Amina Ochieng' }, { id: 'HUM002', name: 'Brian Mutua' }] },
+    { destination: 'Kigali', country: 'Rwanda', type: 'Conference', department: 'Business', startDate: '2026-06-03', endDate: '2026-06-06', students: 12, staff: 2, budgetTransport: 200000, budgetAccommodation: 280000, budgetMeals: 60000, budgetOther: 40000, coordinator: 'Prof. Amina Hassan', email: 'a.hassan@uni.ac.ke', description: 'Pan-African Business Leadership Summit — student delegates.', status: 'pending', roster: [{ id: 'BUS001', name: 'Daniel Kamau' }, { id: 'BUS002', name: 'Faith Njeri' }] },
+    { destination: 'Nakuru', country: 'Kenya', type: 'Research', department: 'Science', startDate: '2026-04-28', endDate: '2026-04-30', students: 20, staff: 3, budgetTransport: 30000, budgetAccommodation: 40000, budgetMeals: 18000, budgetOther: 7000, coordinator: 'Dr. Peter Kariuki', email: 'p.kariuki@uni.ac.ke', description: 'Field research on Lake Nakuru ecosystem and flamingo population.', status: 'completed', roster: [{ id: 'SCI001', name: 'Grace Achieng' }, { id: 'SCI002', name: 'Henry Otieno' }] },
+    { destination: 'Nairobi CBD', country: 'Kenya', type: 'Hackathon', department: 'Engineering', startDate: '2026-05-20', endDate: '2026-05-21', students: 30, staff: 2, budgetTransport: 15000, budgetAccommodation: 0, budgetMeals: 30000, budgetOther: 5000, coordinator: 'Eng. Samuel Waweru', email: 's.waweru@uni.ac.ke', description: 'National Tech Hackathon — AI & IoT competition tracks.', status: 'pending', roster: [{ id: 'ENG001', name: 'Kevin Odhiambo' }, { id: 'ENG002', name: 'Joyce Muthoni' }] },
+    { destination: 'Cape Town', country: 'South Africa', type: 'Academic', department: 'Law', startDate: '2026-07-14', endDate: '2026-07-21', students: 18, staff: 2, budgetTransport: 350000, budgetAccommodation: 320000, budgetMeals: 80000, budgetOther: 50000, coordinator: 'Prof. Lydia Waweru', email: 'l.waweru@uni.ac.ke', description: 'International Law moot court competition and faculty exchange.', status: 'approved', roster: [] },
+  ].forEach(d => tripService.createTrip(d));
+
+  // Notifications
+  [
+    { department: 'Engineering', type: 'Hackathon', title: 'National Hackathon — Nairobi 2026', message: 'Engineering students: the annual Tech Hackathon is confirmed for 20–21 May. Register with your HOD by 30 Apr.', color: 'pink', targetRole: 'student' },
+    { department: 'Humanities', type: 'Cultural', title: 'Cultural Heritage Tour — Mombasa', message: 'Humanities students are invited to the Swahili Coast heritage tour. 45 slots available. Trip is approved.', color: 'green', targetRole: 'all' },
+    { department: 'All', type: 'Conference', title: 'Pan-African Business Summit — Kigali', message: '12 delegate slots for Business dept. Submit motivation letter to the dean by 15 May.', color: 'blue', targetRole: 'all' },
+    { department: 'Science', type: 'Research', title: 'Lake Nakuru Field Research — COMPLETED', message: 'Research trip completed successfully. 20 students participated. Reports due by 10 May.', color: 'gold', targetRole: 'all' },
+  ].forEach(d => notifService.send(d.department, d.type, d.title, d.message, d.color, d.targetRole));
+}
+seedData();
+
+/* ═══════════════════════════════════════════════════
+   FRONTEND CONTROLLER
+═══════════════════════════════════════════════════ */
+let currentRole = 'admin';
+
+// ── SVG ICONS ──
+const ICONS = {
+  dashboard: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/></svg>`,
+  trips: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 13l4.553 2.276A1 1 0 0021 21.382V10.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0L9 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  approval: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  notif: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  calendar: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  add: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  roster: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  search: `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  mytrips: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
+  apply: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  close: `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  check: `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  x: `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+  download: `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  send: `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  eye: `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>`,
+  trash: `<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+};
+
+// ── NAV CONFIG ──
+const ADMIN_NAV = [
+  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+  { id: 'trips', label: 'All Trips', icon: 'trips' },
+  { id: 'approvals', label: 'Approvals', icon: 'approval', badge: true },
+  { id: 'notifications', label: 'Notifications', icon: 'notif' },
+  { id: 'calendar', label: 'Calendar', icon: 'calendar' },
+  { id: 'add-trip', label: 'Add Trip', icon: 'add' },
+];
+const STUDENT_NAV = [
+  { id: 'student-home', label: 'Home', icon: 'dashboard' },
+  { id: 'browse-trips', label: 'Browse Trips', icon: 'trips' },
+  { id: 'my-trips', label: 'My Applications', icon: 'mytrips' },
+  { id: 'notifications', label: 'Notifications', icon: 'notif' },
+  { id: 'calendar', label: 'Calendar', icon: 'calendar' },
+];
+
+// ── HELPERS ──
+function fmt(d) { if (!d) return '—'; const p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
+function bclass(type) { return 'badge-' + (type || 'academic').toLowerCase(); }
+function sclass(s) { return 'badge-' + (s || 'pending'); }
+function kfmt(n) { return n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? Math.round(n/1000)+'K' : n.toString(); }
+function initials(name) { return name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase(); }
+function timeAgo(iso) {
+  const d = (Date.now() - new Date(iso)) / 1000;
+  if (d < 60) return 'just now';
+  if (d < 3600) return Math.floor(d/60) + 'm ago';
+  if (d < 86400) return Math.floor(d/3600) + 'h ago';
+  return Math.floor(d/86400) + 'd ago';
+}
+
+// ── AUTH ──
+let calState = { year: 2026, month: 3 };
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function selectRole(role) {
+  currentRole = role;
+  document.getElementById('role-admin').classList.toggle('selected', role === 'admin');
+  document.getElementById('role-student').classList.toggle('selected', role === 'student');
+  document.getElementById('login-user').value = role === 'admin' ? 'admin' : 'ENG001';
+  document.getElementById('login-pass').value = role === 'admin' ? 'admin123' : 'student123';
+}
+function fillStudent() { selectRole('student'); }
+
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value.trim();
+  try {
+    const user = authService.login(u, p);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-shell').classList.add('visible');
+    initApp(user);
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function doLogout() {
+  authService.logout();
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app-shell').classList.remove('visible');
+  document.getElementById('main-content').innerHTML = '';
+}
+
+// ── APP INIT ──
+function initApp(user) {
+  const isAdmin = user.role === 'admin';
+  const nav = isAdmin ? ADMIN_NAV : STUDENT_NAV;
+  document.getElementById('sb-avatar').textContent = initials(user.name);
+  document.getElementById('sb-avatar').className = 'avatar ' + user.role;
+  document.getElementById('sb-name').textContent = user.name;
+  document.getElementById('sb-role').textContent = isAdmin ? 'Administrator' : user.department + ' · Student';
+  renderNav(nav, isAdmin ? 'dashboard' : 'student-home');
+  if (isAdmin) renderAdminPanel('dashboard');
+  else renderStudentPanel('student-home');
+}
+
+function renderNav(navItems, activeId) {
+  const user = authService.getUser();
+  const pending = tripService.getAllTrips({ status: 'pending' }).length;
+  const unread = notifService.getUnreadCount(user);
+  document.getElementById('sidebar-nav').innerHTML = `
+    <div class="nav-section">
+      ${navItems.map(n => `
+        <div class="nav-item ${n.id === activeId ? 'active' : ''}" onclick="navTo('${n.id}')" id="nav-${n.id}">
+          ${ICONS[n.icon]} ${n.label}
+          ${n.badge && pending > 0 ? `<span class="nav-badge">${pending}</span>` : ''}
+          ${n.id === 'notifications' && unread > 0 ? `<span class="nav-badge">${unread}</span>` : ''}
+        </div>`).join('')}
+    </div>`;
+}
+
+function navTo(id) {
+  const user = authService.getUser();
+  const isAdmin = user.role === 'admin';
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('nav-' + id);
+  if (el) el.classList.add('active');
+  if (isAdmin) renderAdminPanel(id);
+  else renderStudentPanel(id);
+}
+
+/* ════════════════════════════════════════
+   ADMIN PANELS
+════════════════════════════════════════ */
+function renderAdminPanel(id) {
+  const mc = document.getElementById('main-content');
+  if (id === 'dashboard') mc.innerHTML = adminDashboard();
+  else if (id === 'trips') { mc.innerHTML = adminTripsPage(); attachTripFilters(); }
+  else if (id === 'approvals') mc.innerHTML = adminApprovalsPage();
+  else if (id === 'notifications') mc.innerHTML = notificationsPage(true);
+  else if (id === 'calendar') { mc.innerHTML = calendarPage(); renderCal(); }
+  else if (id === 'add-trip') mc.innerHTML = addTripPage();
+}
+
+function adminDashboard() {
+  const stats = tripService.getDashboardStats();
+  const recent = tripService.getAllTrips().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
+  const notifs = notifService.getAll().slice(0, 4);
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Dashboard</div><div class="page-sub">Welcome back, ${authService.getUser().name.split(' ')[0]}</div></div>
+    <div class="header-actions">
+      <button class="btn btn-primary btn-sm" onclick="navTo('add-trip')">${ICONS.add} New Trip</button>
+    </div>
+  </div>
+  <div class="content-area">
+    <div class="stats-grid">
+      <div class="stat-card blue"><div class="stat-icon blue"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 13l4.553 2.276A1 1 0 0021 21.382V10.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0L9 4" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stat-label">Total Trips</div><div class="stat-value" style="color:#60a5fa">${stats.total}</div><div class="stat-change">${stats.approved} approved</div></div>
+      <div class="stat-card gold"><div class="stat-icon gold"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#fcd34d" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="#fcd34d" stroke-width="1.8" stroke-linecap="round"/></svg></div><div class="stat-label">Pending Approval</div><div class="stat-value" style="color:#fcd34d">${stats.pending}</div><div class="stat-change">Awaiting review</div></div>
+      <div class="stat-card green"><div class="stat-icon green"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stat-label">Participants</div><div class="stat-value" style="color:#34d399">${stats.totalParticipants}</div><div class="stat-change">Across all trips</div></div>
+      <div class="stat-card purple"><div class="stat-icon purple"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round"/></svg></div><div class="stat-label">Total Budget</div><div class="stat-value" style="color:#a78bfa">KES ${kfmt(stats.totalBudget)}</div><div class="stat-change">Across all trips</div></div>
+      <div class="stat-card teal"><div class="stat-icon teal"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#5eead4" stroke-width="1.8"/></svg></div><div class="stat-label">Completed</div><div class="stat-value" style="color:#5eead4">${stats.completed}</div><div class="stat-change">Trips finished</div></div>
+      <div class="stat-card red"><div class="stat-icon red"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#f87171" stroke-width="1.8"/></svg></div><div class="stat-label">Rejected</div><div class="stat-value" style="color:#f87171">${stats.rejected}</div><div class="stat-change">Not approved</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Recent Trips</span><button class="btn btn-ghost btn-sm" onclick="navTo('trips')">View all</button></div>
+        <div class="card-body" style="padding:0">
+          ${recent.map(t => `
+            <div class="notif-item" style="cursor:pointer" onclick="openTripDetail(${t.id})">
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--text)">${t.destination}, ${t.country}</div>
+                <div style="font-size:11px;color:var(--text2);margin-top:2px">${t.department} · ${fmt(t.startDate)}</div>
+              </div>
+              <span class="badge ${sclass(t.status)}">${t.status}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Notifications Feed</span><button class="btn btn-ghost btn-sm" onclick="navTo('notifications')">View all</button></div>
+        <div class="card-body" style="padding:0">
+          ${notifs.map(n => `
+            <div class="notif-item">
+              <div class="notif-dot-wrap"><div class="notif-dot"></div></div>
+              <div class="notif-body">
+                <div class="notif-title">${n.title}</div>
+                <div style="font-size:11px;color:var(--text3)">${n.department} · ${timeAgo(n.createdAt)}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function adminTripsPage(filters = {}) {
+  const trips = tripService.getAllTrips(filters);
+  return `
+  <div class="page-header">
+    <div><div class="page-title">All Trips</div><div class="page-sub">${trips.length} trips found</div></div>
+    <div class="header-actions">
+      <button class="btn btn-primary btn-sm" onclick="navTo('add-trip')">${ICONS.add} Add Trip</button>
+    </div>
+  </div>
+  <div class="content-area">
+    <div class="search-row">
+      <div class="search-input-wrap">${ICONS.search}<input type="text" id="trip-search" placeholder="Search destination, department..." value="${filters.search || ''}" oninput="filterTrips()"></div>
+      <select class="filter-select" id="trip-type" onchange="filterTrips()">
+        <option value="">All types</option>
+        ${['Academic','Cultural','Research','Conference','Sports','Hackathon'].map(t=>`<option ${filters.type===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <select class="filter-select" id="trip-dept" onchange="filterTrips()">
+        <option value="">All departments</option>
+        ${['Engineering','Business','Humanities','Science','Law','Medicine'].map(d=>`<option ${filters.department===d?'selected':''}>${d}</option>`).join('')}
+      </select>
+      <select class="filter-select" id="trip-status" onchange="filterTrips()">
+        <option value="">All statuses</option>
+        ${['pending','approved','completed','rejected'].map(s=>`<option ${filters.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div id="trips-list">
+      ${trips.length ? trips.map(t => tripCard(t, true)).join('') : emptyState('No trips match your filters')}
+    </div>
+  </div>`;
+}
+
+function attachTripFilters() {
+  // handled inline by filterTrips()
+}
+
+function filterTrips() {
+  const search = document.getElementById('trip-search')?.value || '';
+  const type = document.getElementById('trip-type')?.value || '';
+  const department = document.getElementById('trip-dept')?.value || '';
+  const status = document.getElementById('trip-status')?.value || '';
+  const trips = tripService.getAllTrips({ search, type, department, status });
+  document.getElementById('trips-list').innerHTML = trips.length ? trips.map(t => tripCard(t, true)).join('') : emptyState('No trips match your filters');
+}
+
+function tripCard(t, isAdmin) {
+  const pct = t.totalBudget > 0 ? Math.round(([t.budgetTransport,t.budgetAccommodation].reduce((a,b)=>a+b,0) / t.totalBudget)*100) : 0;
+  return `<div class="trip-item">
+    <div class="trip-item-left">
+      <div class="trip-dest-line">${t.destination}, ${t.country}</div>
+      <div class="trip-meta-row">
+        <span>${ICONS.calendar} ${fmt(t.startDate)} – ${fmt(t.endDate)}</span>
+        <span>${ICONS.roster} ${t.students} students · ${t.staff} staff</span>
+        <span>🎓 ${t.department}</span>
+      </div>
+      <div class="trip-tags">
+        <span class="badge ${bclass(t.type)}">${t.type}</span>
+        <span class="badge ${sclass(t.status)}">${t.status}</span>
+        <span class="badge badge-dept">${t.department}</span>
+      </div>
+      ${t.description ? `<div style="font-size:12px;color:var(--text2);margin-top:6px">${t.description.substring(0,80)}${t.description.length>80?'…':''}</div>` : ''}
+    </div>
+    <div class="trip-item-right">
+      <div class="trip-budget">KES ${kfmt(t.totalBudget)}</div>
+      <div class="trip-actions-row">
+        <button class="btn btn-ghost btn-xs" onclick="openTripDetail(${t.id})">${ICONS.eye}</button>
+        <button class="btn btn-ghost btn-xs" onclick="openRoster(${t.id})">${ICONS.roster}</button>
+        ${isAdmin ? `<button class="btn btn-danger btn-xs" onclick="deleteTripUI(${t.id})">${ICONS.trash}</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function adminApprovalsPage() {
+  const pending = tripService.getAllTrips({ status: 'pending' });
+  const others = tripService.getAllTrips().filter(t => t.status !== 'pending');
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Approval Workflow</div><div class="page-sub">${pending.length} trip${pending.length!==1?'s':''} awaiting review</div></div>
+  </div>
+  <div class="content-area">
+    <div class="workflow-steps">
+      <div class="wstep done"><div class="wstep-dot">${ICONS.check}</div><div class="wstep-label">Submitted</div></div>
+      <div class="wstep active"><div class="wstep-dot" style="font-size:10px">2</div><div class="wstep-label">Review</div></div>
+      <div class="wstep"><div class="wstep-dot" style="font-size:10px">3</div><div class="wstep-label">Approved</div></div>
+      <div class="wstep"><div class="wstep-dot" style="font-size:10px">4</div><div class="wstep-label">Completed</div></div>
+    </div>
+    ${pending.length ? `<div style="margin-bottom:.75rem;font-size:12px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Pending Review</div>
+    ${pending.map(t => `<div class="card" style="margin-bottom:.75rem">
+      <div class="card-body">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:500;font-size:15px;font-family:'DM Serif Display',serif;margin-bottom:4px">${t.destination}, ${t.country}</div>
+            <div class="trip-meta-row" style="margin-bottom:6px"><span>${t.department}</span><span>${t.coordinator}</span><span>${fmt(t.startDate)} – ${fmt(t.endDate)}</span></div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap"><span class="badge ${bclass(t.type)}">${t.type}</span><span style="font-size:12px;color:var(--text2)">KES ${kfmt(t.totalBudget)} · ${t.totalParticipants} participants</span></div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-success btn-sm" onclick="approveTrip(${t.id},'approved')">${ICONS.check} Approve</button>
+            <button class="btn btn-danger btn-sm" onclick="approveTrip(${t.id},'rejected')">${ICONS.x} Reject</button>
+            <button class="btn btn-ghost btn-sm" onclick="openTripDetail(${t.id})">${ICONS.eye} View</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('')}` : '<div class="card"><div class="card-body" style="text-align:center;padding:2rem;color:var(--text2)">No pending trips — all caught up!</div></div>'}
+    ${others.length ? `<div style="margin:1rem 0 .75rem;font-size:12px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Other Trips</div>
+    ${others.map(t => `<div class="card" style="margin-bottom:.5rem;padding:.85rem 1.25rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+        <div>
+          <span style="font-weight:500">${t.destination}</span>
+          <span style="font-size:12px;color:var(--text2);margin-left:8px">${t.department} · ${fmt(t.startDate)}</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="badge ${sclass(t.status)}">${t.status}</span>
+          ${t.status==='approved'?`<button class="btn btn-warn btn-xs" onclick="approveTrip(${t.id},'completed')">Mark Completed</button>`:''}
+        </div>
+      </div>
+    </div>`).join('')}` : ''}
+  </div>`;
+}
+
+function notificationsPage(isAdmin) {
+  const user = authService.getUser();
+  const notifs = isAdmin ? notifService.getAll() : notifService.getForUser(user);
+  const colorMap = { blue:'var(--accent2)', green:'var(--green2)', gold:'var(--gold2)', pink:'#f9a8d4', info:'var(--accent2)' };
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Notifications</div><div class="page-sub">${notifs.length} notifications</div></div>
+    <div class="header-actions">
+      ${isAdmin ? `<button class="btn btn-primary btn-sm" onclick="openSendNotif()">${ICONS.send} Send Notification</button>` : ''}
+      <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark all read</button>
+    </div>
+  </div>
+  <div class="content-area">
+    <div class="card">
+      ${notifs.length ? notifs.map(n => `
+        <div class="notif-item ${n.read?'':'unread'}" onclick="markRead(${n.id},this)">
+          <div class="notif-dot-wrap" style="padding-top:4px"><div style="width:8px;height:8px;border-radius:50%;background:${colorMap[n.color]||'var(--accent2)'};${n.read?'opacity:.3':''}"></div></div>
+          <div class="notif-body">
+            <div class="notif-title">${n.title}</div>
+            <div class="notif-msg">${n.message}</div>
+            <div class="notif-foot">
+              <span class="badge ${bclass(n.type)}">${n.type}</span>
+              <span>🎓 ${n.department}</span>
+              <span>${timeAgo(n.createdAt)}</span>
+            </div>
+          </div>
+        </div>`).join('') : emptyState('No notifications yet')}
+    </div>
+  </div>`;
+}
+
+function calendarPage() {
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Trip Calendar</div><div class="page-sub">Monthly overview of all scheduled trips</div></div>
+  </div>
+  <div class="content-area">
+    <div class="card">
+      <div class="card-header">
+        <div class="cal-nav" style="width:100%">
+          <button class="btn btn-ghost btn-sm" onclick="shiftMonth(-1)">← Prev</button>
+          <div class="cal-month" id="cal-title"></div>
+          <button class="btn btn-ghost btn-sm" onclick="shiftMonth(1)">Next →</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="cal-grid" id="cal-days-head">
+          ${DAYS.map(d=>`<div class="cal-head">${d}</div>`).join('')}
+        </div>
+        <div class="cal-grid" id="cal-body"></div>
+        <div id="cal-legend" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:1rem;font-size:11px;color:var(--text2)"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderCal() {
+  const { year, month } = calState;
+  document.getElementById('cal-title').textContent = `${MONTHS[month]} ${year}`;
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+  const trips = tripService.getAllTrips();
+  const typeClass = { Academic:'ev-a', Cultural:'ev-c', Research:'ev-r', Conference:'ev-co', Sports:'ev-s', Hackathon:'ev-h' };
+  let html = '';
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-cell other"></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===d;
+    const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayTrips = trips.filter(t => t.startDate<=ds && t.endDate>=ds);
+    let evs = dayTrips.slice(0,2).map(t=>`<div class="cal-ev ${typeClass[t.type]||'ev-a'}" onclick="openTripDetail(${t.id})" title="${t.destination}">${t.destination}</div>`).join('');
+    if (dayTrips.length > 2) evs += `<div style="font-size:9px;color:var(--text3)">+${dayTrips.length-2}</div>`;
+    html += `<div class="cal-cell${isToday?' today':''}"><div class="cal-num">${d}</div>${evs}</div>`;
+  }
+  document.getElementById('cal-body').innerHTML = html;
+  const types = [...new Set(trips.map(t=>t.type))];
+  document.getElementById('cal-legend').innerHTML = types.map(t=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-ev ${typeClass[t]||'ev-a'}" style="padding:2px 7px">${t}</div></div>`).join('');
+}
+
+function shiftMonth(dir) {
+  calState.month += dir;
+  if (calState.month > 11) { calState.month = 0; calState.year++; }
+  if (calState.month < 0) { calState.month = 11; calState.year--; }
+  renderCal();
+}
+
+function addTripPage() {
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Add New Trip</div><div class="page-sub">Fill out all details — trip will be submitted for approval</div></div>
+  </div>
+  <div class="content-area">
+    <div class="card">
+      <div class="card-body">
+        <div class="fgrid">
+          <div class="fg"><label>Destination *</label><input id="f-dest" placeholder="e.g. Mombasa"></div>
+          <div class="fg"><label>Country</label><input id="f-country" placeholder="e.g. Kenya" value="Kenya"></div>
+          <div class="fg"><label>Trip Type *</label>
+            <select id="f-type"><option value="">Select type…</option>
+              ${['Academic','Cultural','Research','Conference','Sports','Hackathon'].map(t=>`<option>${t}</option>`).join('')}
+            </select>
+          </div>
+          <div class="fg"><label>Department *</label>
+            <select id="f-dept"><option value="">Select department…</option>
+              ${['Engineering','Business','Humanities','Science','Law','Medicine'].map(d=>`<option>${d}</option>`).join('')}
+            </select>
+          </div>
+          <div class="fg"><label>Start Date *</label><input type="date" id="f-start"></div>
+          <div class="fg"><label>End Date *</label><input type="date" id="f-end"></div>
+          <div class="fg"><label>No. of Students</label><input type="number" id="f-students" placeholder="30" min="0"></div>
+          <div class="fg"><label>No. of Staff</label><input type="number" id="f-staff" placeholder="3" min="0"></div>
+          <div class="fg"><label>Transport (KES)</label><input type="number" id="f-trans" placeholder="0" min="0"></div>
+          <div class="fg"><label>Accommodation (KES)</label><input type="number" id="f-accm" placeholder="0" min="0"></div>
+          <div class="fg"><label>Meals (KES)</label><input type="number" id="f-meals" placeholder="0" min="0"></div>
+          <div class="fg"><label>Other (KES)</label><input type="number" id="f-other" placeholder="0" min="0"></div>
+          <div class="fg"><label>Coordinator Name</label><input id="f-coord" placeholder="Full name"></div>
+          <div class="fg"><label>Coordinator Email</label><input type="email" id="f-email" placeholder="coordinator@uni.ac.ke"></div>
+          <div class="fg full"><label>Objectives / Description</label><textarea id="f-desc" placeholder="Trip purpose and learning outcomes…"></textarea></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:1rem">
+          <button class="btn btn-ghost" onclick="clearAddForm()">Clear</button>
+          <button class="btn btn-primary" onclick="saveTrip()">${ICONS.add} Save Trip</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════════════════
+   STUDENT PANELS
+════════════════════════════════════════ */
+function renderStudentPanel(id) {
+  const mc = document.getElementById('main-content');
+  if (id === 'student-home') mc.innerHTML = studentHome();
+  else if (id === 'browse-trips') { mc.innerHTML = browseTripsPage(); }
+  else if (id === 'my-trips') mc.innerHTML = myTripsPage();
+  else if (id === 'notifications') mc.innerHTML = notificationsPage(false);
+  else if (id === 'calendar') { mc.innerHTML = calendarPage(); renderCal(); }
+}
+
+function studentHome() {
+  const user = authService.getUser();
+  const available = tripService.getAllTrips({ status: 'approved', department: '' }).filter(t => t.status === 'approved');
+  const applied = user.appliedTrips || [];
+  const notifs = notifService.getForUser(user).slice(0, 3);
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Welcome, ${user.name.split(' ')[0]}</div><div class="page-sub">${user.department} · ${user.id}</div></div>
+    <div class="header-actions"><button class="btn btn-primary btn-sm" onclick="navTo('browse-trips')">${ICONS.apply} Browse Trips</button></div>
+  </div>
+  <div class="content-area">
+    <div class="welcome-banner">
+      <div class="wb-icon"><svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z" stroke="#60a5fa" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 12v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5" stroke="#60a5fa" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+      <div class="wb-text"><div class="wb-title">University Trip Portal</div><div class="wb-sub">Explore approved trips for your department and apply to participate</div></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card blue"><div class="stat-icon blue"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 13l4.553 2.276A1 1 0 0021 21.382V10.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0L9 4" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stat-label">Open Trips</div><div class="stat-value" style="color:#60a5fa">${available.length}</div><div class="stat-change">Available to apply</div></div>
+      <div class="stat-card green"><div class="stat-icon green"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" stroke="#34d399" stroke-width="1.8"/></svg></div><div class="stat-label">My Applications</div><div class="stat-value" style="color:#34d399">${applied.length}</div><div class="stat-change">Trips applied</div></div>
+      <div class="stat-card gold"><div class="stat-icon gold"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="#fcd34d" stroke-width="1.8"/></svg></div><div class="stat-label">Notifications</div><div class="stat-value" style="color:#fcd34d">${notifService.getForUser(user).length}</div><div class="stat-change">For your department</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Open Trips</span><button class="btn btn-ghost btn-sm" onclick="navTo('browse-trips')">Browse all</button></div>
+        <div class="card-body" style="padding:0">
+          ${available.slice(0,3).map(t=>`
+            <div class="apply-card" onclick="openApplyModal(${t.id})" style="margin:.5rem;border-radius:8px">
+              <div><div style="font-weight:500;font-size:13px">${t.destination}, ${t.country}</div><div style="font-size:11px;color:var(--text2)">${t.department} · ${fmt(t.startDate)}</div></div>
+              <div style="display:flex;align-items:center;gap:6px"><span class="badge ${bclass(t.type)}">${t.type}</span><span style="font-size:11px;color:var(--green2)">→ Apply</span></div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Latest Notifications</span><button class="btn btn-ghost btn-sm" onclick="navTo('notifications')">View all</button></div>
+        <div class="card-body" style="padding:0">
+          ${notifs.length ? notifs.map(n=>`
+            <div class="notif-item">
+              <div class="notif-dot-wrap"><div class="notif-dot" style="${n.read?'opacity:.3':''}"></div></div>
+              <div class="notif-body"><div class="notif-title">${n.title}</div><div style="font-size:11px;color:var(--text3)">${timeAgo(n.createdAt)}</div></div>
+            </div>`).join('') : emptyState('No notifications')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function browseTripsPage() {
+  const approved = tripService.getAllTrips({ status: 'approved' });
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Browse Trips</div><div class="page-sub">${approved.length} approved trips available</div></div>
+  </div>
+  <div class="content-area">
+    <div class="search-row">
+      <div class="search-input-wrap">${ICONS.search}<input type="text" id="bt-search" placeholder="Search trips…" oninput="filterBrowse()"></div>
+      <select class="filter-select" id="bt-type" onchange="filterBrowse()">
+        <option value="">All types</option>
+        ${['Academic','Cultural','Research','Conference','Sports','Hackathon'].map(t=>`<option>${t}</option>`).join('')}
+      </select>
+    </div>
+    <div id="browse-list">
+      ${approved.length ? approved.map(t => studentTripCard(t)).join('') : emptyState('No approved trips available')}
+    </div>
+  </div>`;
+}
+
+function filterBrowse() {
+  const q = document.getElementById('bt-search')?.value || '';
+  const type = document.getElementById('bt-type')?.value || '';
+  const trips = tripService.getAllTrips({ status: 'approved', search: q, type });
+  document.getElementById('browse-list').innerHTML = trips.length ? trips.map(t => studentTripCard(t)).join('') : emptyState('No trips match');
+}
+
+function studentTripCard(t) {
+  const user = authService.getUser();
+  const applied = (user.appliedTrips || []).includes(t.id);
+  return `<div class="trip-item">
+    <div class="trip-item-left">
+      <div class="trip-dest-line">${t.destination}, ${t.country}</div>
+      <div class="trip-meta-row">
+        <span>${ICONS.calendar} ${fmt(t.startDate)} – ${fmt(t.endDate)}</span>
+        <span>${ICONS.roster} ${t.students} student slots</span>
+        <span>🎓 ${t.department}</span>
+        <span>👤 ${t.coordinator}</span>
+      </div>
+      <div class="trip-tags">
+        <span class="badge ${bclass(t.type)}">${t.type}</span>
+        <span class="badge badge-approved">open</span>
+      </div>
+      ${t.description ? `<div style="font-size:12px;color:var(--text2);margin-top:6px">${t.description}</div>` : ''}
+    </div>
+    <div class="trip-item-right">
+      <div style="font-size:12px;color:var(--text2);text-align:right">Budget</div>
+      <div class="trip-budget">KES ${kfmt(t.totalBudget)}</div>
+      ${applied
+        ? `<button class="btn btn-success btn-sm" disabled>${ICONS.check} Applied</button>`
+        : `<button class="btn btn-primary btn-sm" onclick="openApplyModal(${t.id})">${ICONS.apply} Apply</button>`}
+    </div>
+  </div>`;
+}
+
+function myTripsPage() {
+  const user = authService.getUser();
+  const applied = (user.appliedTrips || []).map(id => tripService.getTripById(id)).filter(Boolean);
+  return `
+  <div class="page-header">
+    <div><div class="page-title">My Applications</div><div class="page-sub">${applied.length} trip${applied.length!==1?'s':''} applied</div></div>
+  </div>
+  <div class="content-area">
+    ${applied.length ? applied.map(t => `
+      <div class="trip-item">
+        <div class="trip-item-left">
+          <div class="trip-dest-line">${t.destination}, ${t.country}</div>
+          <div class="trip-meta-row"><span>${ICONS.calendar} ${fmt(t.startDate)} – ${fmt(t.endDate)}</span><span>🎓 ${t.department}</span></div>
+          <div class="trip-tags">
+            <span class="badge ${bclass(t.type)}">${t.type}</span>
+            <span class="badge ${sclass(t.status)}">${t.status}</span>
+          </div>
+        </div>
+        <div class="trip-item-right">
+          <div class="trip-budget">KES ${kfmt(t.totalBudget)}</div>
+          <button class="btn btn-ghost btn-xs" onclick="openTripDetail(${t.id})">${ICONS.eye} Details</button>
+        </div>
+      </div>`).join('') : emptyState('You have not applied to any trips yet')}
+  </div>`;
+}
+
+/* ════════════════════════════════════════
+   MODALS
+════════════════════════════════════════ */
+function openTripDetail(id) {
+  const t = tripService.getTripById(id);
+  if (!t) return;
+  const total = t.totalBudget;
+  const bars = [['Transport', t.budgetTransport, '#3b82f6'], ['Accommodation', t.budgetAccommodation, '#8b5cf6'], ['Meals', t.budgetMeals, '#10b981'], ['Other', t.budgetOther, '#f59e0b']];
+  openModal(`
+    <div class="modal-header"><div class="modal-title">${t.destination}, ${t.country}</div><button class="modal-close" onclick="closeModal()">${ICONS.close}</button></div>
+    <div class="modal-body">
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1rem">
+        <span class="badge ${bclass(t.type)}">${t.type}</span>
+        <span class="badge ${sclass(t.status)}">${t.status}</span>
+        <span class="badge badge-dept">${t.department}</span>
+      </div>
+      <div class="detail-row"><span class="detail-key">Coordinator</span><span class="detail-val">${t.coordinator}</span></div>
+      <div class="detail-row"><span class="detail-key">Email</span><span class="detail-val" style="color:var(--accent2)">${t.email}</span></div>
+      <div class="detail-row"><span class="detail-key">Dates</span><span class="detail-val">${fmt(t.startDate)} → ${fmt(t.endDate)}</span></div>
+      <div class="detail-row"><span class="detail-key">Students</span><span class="detail-val">${t.students}</span></div>
+      <div class="detail-row"><span class="detail-key">Staff</span><span class="detail-val">${t.staff}</span></div>
+      <div class="detail-row"><span class="detail-key">Total Participants</span><span class="detail-val">${t.totalParticipants}</span></div>
+      ${t.description ? `<div class="detail-row" style="flex-direction:column;align-items:flex-start;gap:4px"><span class="detail-key">Description</span><span style="font-size:13px;color:var(--text2)">${t.description}</span></div>` : ''}
+      <div style="background:var(--bg3);border-radius:var(--radius2);padding:1rem;margin-top:1rem">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem">Budget Breakdown</div>
+        ${bars.map(([l, v, c]) => total > 0 ? `<div class="bbar-row">
+          <div class="bbar-head"><span class="bbar-label">${l}</span><span class="bbar-val">KES ${v.toLocaleString()} (${Math.round(v/total*100)}%)</span></div>
+          <div class="bbar-track"><div class="bbar-fill" style="width:${Math.round(v/total*100)}%;background:${c}"></div></div>
+        </div>` : '').join('')}
+        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)">
+          <span style="color:var(--text2)">Total</span><span style="color:var(--accent2)">KES ${total.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" onclick="openRoster(${t.id})">${ICONS.roster} Roster (${t.roster.length})</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportCSV(${t.id})">${ICONS.download} Export CSV</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+    </div>`);
+}
+
+function openRoster(tripId) {
+  const t = tripService.getTripById(tripId);
+  if (!t) return;
+  const isAdmin = authService.getUser().role === 'admin';
+  openModal(`
+    <div class="modal-header"><div class="modal-title">Student Roster — ${t.destination}</div><button class="modal-close" onclick="closeModal()">${ICONS.close}</button></div>
+    <div class="modal-body">
+      ${isAdmin ? `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <span style="font-size:13px;color:var(--text2)">${t.roster.length} student${t.roster.length!==1?'s':''}</span>
+        <button class="btn btn-primary btn-sm" onclick="addStudentPrompt(${tripId})">${ICONS.add} Add Student</button>
+      </div>` : ''}
+      <div class="tbl-wrap">
+        <table class="data-tbl" id="roster-tbl-${tripId}">
+          <thead><tr><th>ID</th><th>Name</th>${isAdmin?'<th>Action</th>':''}</tr></thead>
+          <tbody>${t.roster.length ? t.roster.map((s,i)=>`<tr><td style="color:var(--text3)">${s.id}</td><td>${s.name}</td>${isAdmin?`<td><button class="btn btn-danger btn-xs" onclick="removeStudentUI(${tripId},'${s.id}')">${ICONS.trash}</button></td>`:''}</tr>`).join('') : `<tr><td colspan="${isAdmin?3:2}" style="text-align:center;color:var(--text3)">No students enrolled</td></tr>`}</tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">Close</button></div>`);
+}
+
+function addStudentPrompt(tripId) {
+  const id = prompt('Student ID:');
+  const name = prompt('Student Full Name:');
+  if (id && name) {
+    try {
+      tripService.addToRoster(tripId, { id: id.trim(), name: name.trim() });
+      showToast('Student added', 'success');
+      openRoster(tripId);
+    } catch (e) { showToast(e.message, 'error'); }
+  }
+}
+
+function removeStudentUI(tripId, studentId) {
+  tripService.removeFromRoster(tripId, studentId);
+  showToast('Student removed');
+  openRoster(tripId);
+}
+
+function openApplyModal(tripId) {
+  const t = tripService.getTripById(tripId);
+  const user = authService.getUser();
+  if (!t) return;
+  openModal(`
+    <div class="modal-header"><div class="modal-title">Apply for Trip</div><button class="modal-close" onclick="closeModal()">${ICONS.close}</button></div>
+    <div class="modal-body">
+      <div style="background:var(--bg3);border-radius:var(--radius2);padding:1rem;margin-bottom:1rem">
+        <div style="font-weight:500;font-size:15px;font-family:'DM Serif Display',serif">${t.destination}, ${t.country}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">${t.department} · ${fmt(t.startDate)} – ${fmt(t.endDate)}</div>
+        <div style="margin-top:8px;display:flex;gap:5px"><span class="badge ${bclass(t.type)}">${t.type}</span></div>
+      </div>
+      <div class="detail-row"><span class="detail-key">Your Name</span><span class="detail-val">${user.name}</span></div>
+      <div class="detail-row"><span class="detail-key">Your ID</span><span class="detail-val">${user.id}</span></div>
+      <div class="detail-row"><span class="detail-key">Department</span><span class="detail-val">${user.department}</span></div>
+      <div class="detail-row"><span class="detail-key">Budget per person</span><span class="detail-val" style="color:var(--accent2)">KES ${t.students>0?Math.round(t.totalBudget/t.students).toLocaleString():'—'}</span></div>
+      <div class="fg" style="margin-top:1rem"><label>Motivation (optional)</label><textarea id="apply-motiv" placeholder="Why do you want to join this trip?"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitApplication(${tripId})">${ICONS.apply} Submit Application</button>
+    </div>`);
+}
+
+function submitApplication(tripId) {
+  const user = authService.getUser();
+  if (!user.appliedTrips) user.appliedTrips = [];
+  if (user.appliedTrips.includes(tripId)) { showToast('Already applied', 'error'); return; }
+  try {
+    tripService.addToRoster(tripId, { id: user.id, name: user.name });
+    user.appliedTrips.push(tripId);
+    showToast('Application submitted!', 'success');
+    closeModal();
+    notifService.send(user.department, 'Academic', `New Application — ${authService.getUser().name}`, `${user.name} applied for a trip. Review in the roster.`, 'blue', 'admin');
+    renderStudentPanel('student-home');
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+function openSendNotif() {
+  openModal(`
+    <div class="modal-header"><div class="modal-title">Send Notification</div><button class="modal-close" onclick="closeModal()">${ICONS.close}</button></div>
+    <div class="modal-body">
+      <div class="fgrid">
+        <div class="fg"><label>Department</label>
+          <select id="mn-dept">
+            <option value="All">All Departments</option>
+            ${['Engineering','Business','Humanities','Science','Law','Medicine'].map(d=>`<option>${d}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg"><label>Event Type</label>
+          <select id="mn-type">
+            ${['Academic','Cultural','Research','Conference','Sports','Hackathon'].map(t=>`<option>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg"><label>Notify</label>
+          <select id="mn-target"><option value="all">All Users</option><option value="student">Students Only</option><option value="admin">Admins Only</option></select>
+        </div>
+        <div class="fg"><label>Color</label>
+          <select id="mn-color"><option value="blue">Blue (Info)</option><option value="green">Green (Success)</option><option value="gold">Gold (Alert)</option><option value="pink">Pink (Event)</option></select>
+        </div>
+        <div class="fg full"><label>Title *</label><input id="mn-title" placeholder="Notification title…"></div>
+        <div class="fg full"><label>Message</label><textarea id="mn-msg" placeholder="Notification details…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="doSendNotif()">${ICONS.send} Send</button>
+    </div>`);
+}
+
+function doSendNotif() {
+  const title = document.getElementById('mn-title')?.value.trim();
+  if (!title) { showToast('Title required', 'error'); return; }
+  const dept = document.getElementById('mn-dept').value;
+  const type = document.getElementById('mn-type').value;
+  const target = document.getElementById('mn-target').value;
+  const color = document.getElementById('mn-color').value;
+  const msg = document.getElementById('mn-msg').value;
+  notifService.send(dept, type, title, msg, color, target);
+  closeModal();
+  showToast('Notification sent!', 'success');
+  navTo('notifications');
+  renderNav(ADMIN_NAV, 'notifications');
+}
+
+function approveTrip(id, status) {
+  tripService.updateStatus(id, status);
+  const t = tripService.getTripById(id);
+  const msgs = { approved: `Trip to ${t.destination} approved`, rejected: `Trip to ${t.destination} rejected`, completed: `Trip to ${t.destination} marked completed` };
+  notifService.send(t.department, t.type, msgs[status], `Status updated to "${status}" by admin.`, status==='approved'?'green':status==='completed'?'blue':'gold', 'all');
+  showToast(msgs[status], status === 'rejected' ? 'error' : 'success');
+  navTo('approvals');
+  renderNav(ADMIN_NAV, 'approvals');
+}
+
+function deleteTripUI(id) {
+  if (confirm('Delete this trip?')) {
+    tripService.deleteTrip(id);
+    showToast('Trip deleted');
+    navTo('trips');
+  }
+}
+
+function saveTrip() {
+  const dest = document.getElementById('f-dest')?.value.trim();
+  const type = document.getElementById('f-type')?.value;
+  const dept = document.getElementById('f-dept')?.value;
+  const start = document.getElementById('f-start')?.value;
+  const end = document.getElementById('f-end')?.value;
+  if (!dest || !type || !dept || !start || !end) { showToast('Fill in required fields', 'error'); return; }
+  tripService.createTrip({
+    destination: dest, country: document.getElementById('f-country').value || 'Kenya',
+    type, department: dept, startDate: start, endDate: end,
+    students: parseInt(document.getElementById('f-students').value) || 0,
+    staff: parseInt(document.getElementById('f-staff').value) || 0,
+    budgetTransport: parseFloat(document.getElementById('f-trans').value) || 0,
+    budgetAccommodation: parseFloat(document.getElementById('f-accm').value) || 0,
+    budgetMeals: parseFloat(document.getElementById('f-meals').value) || 0,
+    budgetOther: parseFloat(document.getElementById('f-other').value) || 0,
+    coordinator: document.getElementById('f-coord').value,
+    email: document.getElementById('f-email').value,
+    description: document.getElementById('f-desc').value,
+  });
+  notifService.send(dept, type, `New Trip Submitted: ${dest}`, `A new ${type} trip to ${dest} has been submitted for approval.`, 'blue', 'admin');
+  showToast('Trip saved — pending approval', 'success');
+  navTo('dashboard');
+  renderNav(ADMIN_NAV, 'dashboard');
+}
+
+function clearAddForm() {
+  ['f-dest','f-country','f-start','f-end','f-students','f-staff','f-trans','f-accm','f-meals','f-other','f-coord','f-email','f-desc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['f-type','f-dept'].forEach(id => { const el = document.getElementById(id); if (el) el.selectedIndex = 0; });
+}
+
+function exportCSV(id) {
+  const t = tripService.getTripById(id);
+  if (!t) return;
+  const rows = [
+    ['Field', 'Value'],
+    ['Destination', t.destination], ['Country', t.country], ['Type', t.type],
+    ['Department', t.department], ['Status', t.status], ['Start', t.startDate], ['End', t.endDate],
+    ['Students', t.students], ['Staff', t.staff], ['Coordinator', t.coordinator],
+    ['Transport (KES)', t.budgetTransport], ['Accommodation (KES)', t.budgetAccommodation],
+    ['Meals (KES)', t.budgetMeals], ['Other (KES)', t.budgetOther], ['Total Budget (KES)', t.totalBudget],
+    [], ['Student Roster'], ['ID', 'Name'],
+    ...t.roster.map(s => [s.id, s.name]),
+  ];
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `trip-${t.destination.replace(/\s+/g,'-').toLowerCase()}.csv`;
+  a.click();
+  showToast('CSV exported', 'success');
+}
+
+function markRead(id, el) {
+  notifService.markRead(id);
+  el.classList.remove('unread');
+  el.querySelector('[style*="opacity"]')?.setAttribute('style', 'width:8px;height:8px;border-radius:50%;background:var(--text3)');
+}
+function markAllRead() {
+  notifService.markAllRead();
+  showToast('All marked as read');
+  const user = authService.getUser();
+  navTo('notifications');
+  renderNav(user.role === 'admin' ? ADMIN_NAV : STUDENT_NAV, 'notifications');
+}
+
+// ── MODAL ──
+function openModal(html) { document.getElementById('modal-box').innerHTML = html; document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function maybeClose(e) { if (e.target.id === 'modal') closeModal(); }
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg, type = 'info') {
+  const stack = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<div class="t-dot"></div>${msg}`;
+  stack.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 2500);
+}
+
+// ── EMPTY STATE ──
+function emptyState(msg) {
+  return `<div class="empty-state"><svg width="40" height="40" fill="none" viewBox="0 0 24 24" style="stroke:currentColor;stroke-width:1.2"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 13l4.553 2.276A1 1 0 0021 21.382V10.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0L9 4"/></svg><p>${msg}</p></div>`;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    padding: 2rem;
+}
+
+form {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.header h3 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.header p {
+    color: #666;
+    line-height: 1.6;
+}
+
+section {
+    margin-bottom: 2rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+select {
+    background-color: white;
+}
+
+.buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"] {
+    background-color: #2ecc71;
+    color: white;
+}
+
+button[type="submit"]:hover {
+    background-color: #27ae60;
+}
+
+button:last-child {
+    background-color: #e74c3c;
+    color: white;
+}
+
+button:last-child:hover {
+    background-color: #c0392b;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 1rem;
+    }
+    
+    form {
+        padding: 1rem;
+    }
+    
+    .buttons {
+        flex-direction: column;
+    }
+    
+    button {
+        width: 100%;
+    }
+}
