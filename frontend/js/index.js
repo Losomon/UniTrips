@@ -1,4 +1,4 @@
-<script>
+
 /* ═══════════════════════════════════════════════════
    BACKEND — Java-style architecture in JavaScript
    Mirrors Spring Boot: Service → Repository → Model
@@ -1052,4 +1052,4 @@ function showToast(msg, type = 'info') {
 function emptyState(msg) {
   return `<div class="empty-state"><svg width="40" height="40" fill="none" viewBox="0 0 24 24" style="stroke:currentColor;stroke-width:1.2"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 13l4.553 2.276A1 1 0 0021 21.382V10.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0L9 4"/></svg><p>${msg}</p></div>`;
 }
-</script>
+

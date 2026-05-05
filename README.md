@@ -1,27 +1,66 @@
-# School Trip Management System
+# UniTrips - University Trip Management System
 
-This project is a simple web-based application for managing school trips. It allows users to add new trips and view the list of all trips saved in a text file.
+## 🚀 Quick Start
+
+### Frontend SPA (Standalone - No server needed)
+```
+Open frontend/index.html in your browser
+Demo logins:
+- Admin: admin / admin123
+- Student: ENG001 / student123
+```
+- Modern dashboard with admin/student views
+- Trips management, approvals, notifications, calendar
+- Fully self-contained JavaScript app
+
+### Backend JSP Web App (Tomcat/ servlet container)
+ 1. Copy `backend/` to your Tomcat `webapps/` (rename folder to `unitrips` if desired)
+ 2. Start Tomcat
+ 3. Visit `http://localhost:8080/unitrips/tripForm.jsp`
+ 4. API endpoint: `http://localhost:8080/unitrips/api/trips.jsp`
+- Simple CRUD for trips (file-based storage in `data/trips.txt`)
+- Basic HTML forms
+
+## 📁 Structure
+ ```
+ UniTrips/
+ ├── frontend/           # Modern SPA Dashboard
+ │   ├── index.html
+ │   ├── index.css
+ │   ├── index.js
+ │   └── styles.css      # Legacy
+ ├── backend/            # JSP Web App
+ │   ├── api/            # JSON API endpoints
+ │   │   └── trips.jsp
+ │   ├── tripForm.jsp
+ │   ├── saveTrip.jsp
+ │   ├── viewTrips.jsp
+ │   └── WEB-INF/web.xml
+ ├── LICENSE
+ ├── README.md
+ ├── CODE_OF_CONDUCT.md
+ ├── CONTRIBUTING.md
+ ├── SECURITY.md
+ └── TODO.md
+ ```
 
 ## Features
-- **Add New Trip**: Users can fill out a form to enter details of a new trip (Destination, Start Date, End Date, Number of People, Budget).
-- **View All Trips**: Displays a list of all trips stored in a text file.
 
-## Technology Stack
-- **JSP (JavaServer Pages)** for dynamic web content.
-- **Servlets** (Embedded in JSP) for server-side logic.
-- **HTML/CSS** for front-end user interface.
-- **Java I/O** for saving trip data in a text file.
+**Frontend:**
+- Admin dashboard with stats, approvals workflow
+- Student trip browser & applications
+- Notifications system
+- Calendar view
+- Responsive dark theme
 
-## How It Works
-1. **Add New Trip**: The form in `tripForm.jsp` allows the user to enter trip details. When the form is submitted, the data is saved to a file `trips.txt` located in the `data` directory.
-2. **View All Trips**: The `viewTrips.jsp` page reads the data from `trips.txt` and displays it in a table.
+**Backend:**
+- File-based trip storage
+- Add/view trips
+- Tomcat deployable
 
-## Project Structure
-- `tripForm.jsp`: Contains the form for adding new trips.
-- `saveTrip.jsp`: Handles saving the trip data to a file.
-- `viewTrips.jsp`: Displays the list of all trips stored in the `trips.txt` file.
+## Development
+- Frontend: Pure HTML/CSS/JS - edit & refresh
+- Backend: JSP - deploy to servlet container
 
-## How to Run
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/bettonhezron/School-Trip-Manager.git
+Enjoy managing university trips! 🎒✈️
+
